@@ -66,15 +66,6 @@ const createAdminSession = async (req, res) => {
   const userIds = await User.find({ role: { $ne: "admin" } }, { _id: 1 });
   const startTime = new Date(START_TIME);
   const endTime = new Date(END_TIME);
-  const currentTime = new Date();
-
-  if(startTime>=endTime){
-    return res.status(400).json({ message: "Start time must be earlier than end time." });
-  }
-
-  if(currentTime>=startTime){
-    return res.status(400).json({ message: "Start time must be later than current time." });
-  }
 
   await Promise.all(
     userIds.map(async (user) => {
@@ -126,3 +117,6 @@ module.exports = {
   finishSession,
   validateSession,
 };
+
+
+

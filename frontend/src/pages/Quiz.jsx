@@ -4,10 +4,15 @@ import LoadingState from "../components/LoadingState";
 import { useQuiz } from "../hooks/useQuiz";
 import { SERVER_URL } from "../lib/config";
 import { Navigate } from "react-router-dom/dist";
+import QuizCountDown from "./components/QuizCountDown";
+import useSession from "../hooks/useSession";
 
 export default function Quiz() {
   const { data, isQuizLoading, answerQuestion, isAnswering, isFetching } =
     useQuiz();
+
+  const { session } = useSession();
+
   const [selectedOption, setSelectedOption] = useState(null);
 
   const isLoading = isQuizLoading || isFetching;
@@ -75,24 +80,27 @@ export default function Quiz() {
           )}
         </div>
       </div>
-      <Button
-        className="justify-self-end py-1 text-base bg-quiz-theme border-none"
-        disabled={!selectedOption || isAnswering}
-        onClick={() => {
-          if (!selectedOption) return;
-          answerQuestion({
-            questionId: question._id,
-            answer: selectedOption,
-          });
-          setSelectedOption(null);
-        }}
-      >
-        {isAnswering
-          ? "Répondant..."
-          : answeredCount === questionsCount - 1
-          ? "Terminer"
-          : "Suivant"}
-      </Button>
+      <div className="flex justify-between items-center">
+        {session && <QuizCountDown session={session.session} />}
+        <Button
+          className="justify-self-end py-1 text-base bg-quiz-theme border-none"
+          disabled={!selectedOption || isAnswering}
+          onClick={() => {
+            if (!selectedOption) return;
+            answerQuestion({
+              questionId: question._id,
+              answer: selectedOption,
+            });
+            setSelectedOption(null);
+          }}
+        >
+          {isAnswering
+            ? "Répondant..."
+            : answeredCount === questionsCount - 1
+            ? "Terminer"
+            : "Suivant"}
+        </Button>
+      </div>
     </>
   );
 }

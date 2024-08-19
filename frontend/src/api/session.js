@@ -23,12 +23,9 @@ export const finishSession = async (id) => {
 };
 
 export const createAdminSession = async ({ startTime, endTime }) => {
-
-    const response = await axios.post("/session/create-admin-session", {
-      startTime,
-      endTime,
-    });
-    
-    return response.data;
-  
+  const response = await axios.post("/session/create-admin-session", {
+    startTime,
+    endTime,
+  });
+  return response.data;
 };

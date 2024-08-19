@@ -17,7 +17,9 @@ router.get(
   validateSession,
   getUserSession
 );
-
+// router.post("/create-session", verifyToken, validateSession, createSession);
+// router.put("/start-session", verifyToken, validateSession, startSession);
+// router.put("/finish-session", verifyToken, validateSession, finishSession);
 router.post(
   "/create-admin-session",
   verifyToken,
