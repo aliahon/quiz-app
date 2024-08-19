@@ -1,0 +1,16 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+::-webkit-progress-bar {
+  @apply bg-quiz-medium;
+  border-radius: 100px;
+}
+::-webkit-progress-value {
+  @apply bg-quiz-theme;
+  border-radius: 100px;
+}
+
+#root::-webkit-scrollbar {
+  display: none;
+}
