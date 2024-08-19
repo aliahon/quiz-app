@@ -107,15 +107,15 @@ export default function UsersTab() {
           Confirmer la suppression
         </DialogTitle>
         <DialogContent className="flex flex-col gap-5 w-[500px] bg-quiz-dark">
-          <DialogContentText>
-            Êtes-vous sûr de vouloir supprimer <span className="font-bold text-white">{selectedUser?.username}</span> ?
+          <DialogContentText >
+            <p className="text-white">Êtes-vous sûr de vouloir supprimer <span className="font-bold text-lg text-red-700">{selectedUser?.username}</span> ?</p>
           </DialogContentText>
         </DialogContent>
         <DialogActions className="text-white text-sm bg-quiz-dark">
-          <Button onClick={handleCloseDeleteUserDialog} className="text-white text-sm bg-quiz-dark">
+          <Button onClick={handleCloseDeleteUserDialog} className="text-white text-base bg-quiz-dark">
             Annuler
           </Button>
-          <Button onClick={handleDelete} className="text-sm bg-quiz-dark text-red-600" autoFocus>
+          <Button onClick={handleDelete} className="text-base bg-quiz-dark text-red-600 hover:bg-red-600 hover:border-white hover:text-white border-red-600" autoFocus>
             Supprimer
           </Button>
         </DialogActions>
