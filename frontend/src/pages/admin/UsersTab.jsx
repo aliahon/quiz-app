@@ -13,27 +13,39 @@ import { useTheme } from '@mui/material/styles';
 
 export default function UsersTab() {
   const { users, isLoadingUsers, deleteUser, isDeletingUser } = useUser();
-  const [open, setOpen] = useState(false);
+  const [isAddUserDialogOpen, setIsAddUserDialogOpen] = useState(false);
+  const [isDeleteUserDialogOpen, setIsDeleteUserDialogOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
 
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
-  const handleClose = () => {
-    setOpen(false);
+  const handleCloseAddUserDialog = () => {
+    setIsAddUserDialogOpen(false);
+  };
+
+  const handleCloseDeleteUserDialog = () => {
+    setIsDeleteUserDialogOpen(false);
     setSelectedUser(null);
   };
 
-  const handleClickOpen = (user) => {
+  const handleOpenAddUserDialog = () => {
+    setIsAddUserDialogOpen(true);
+  };
+
+  const handleOpenDeleteUserDialog = (user) => {
     setSelectedUser(user);
-    setOpen(true);
+    setIsDeleteUserDialogOpen(true);
   };
 
   const handleDelete = () => {
     if (selectedUser) {
-      deleteUser(selectedUser._id);
+      deleteUser(selectedUser._id).catch(error => {
+        console.error("Failed to delete user:", error);
+        // Optionally handle the error, e.g., show a notification
+      });
     }
-    handleClose();
+    handleCloseDeleteUserDialog();
   };
 
   if (isLoadingUsers) {
@@ -45,11 +57,11 @@ export default function UsersTab() {
       <div className="flex justify-end">
         <Button
           className="mb-5 py-2 px-3 text-sm"
-          onClick={() => setOpen(true)}
+          onClick={handleOpenAddUserDialog}
         >
           Ajouter un candidat
         </Button>
-        <AddUserDialog open={open} onClose={handleClose} />
+        <AddUserDialog open={isAddUserDialogOpen} onClose={handleCloseAddUserDialog} />
       </div>
       <div className="relative overflow-x-auto border border-quiz-dark sm:rounded-lg w-full">
         <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
@@ -72,7 +84,7 @@ export default function UsersTab() {
                 <td className="px-6 py-4 text-right">
                   <button
                     disabled={isDeletingUser}
-                    onClick={() => handleClickOpen(user)}
+                    onClick={() => handleOpenDeleteUserDialog(user)}
                     className="font-medium text-red-600 dark:text-red-500 hover:underline"
                   >
                     Supprimer
@@ -83,25 +95,27 @@ export default function UsersTab() {
           </tbody>
         </table>
       </div>
+
+      {/* Dialog for confirmation */}
       <Dialog
-        fullScreen={fullScreen}
-        open={Boolean(selectedUser)}
-        onClose={handleClose}
+        open={isDeleteUserDialogOpen}
+        onClose={handleCloseDeleteUserDialog}
         aria-labelledby="responsive-dialog-title"
+        fullScreen={fullScreen}
       >
-        <DialogTitle id="responsive-dialog-title">
+        <DialogTitle id="responsive-dialog-title" className="text-white bg-quiz-dark">
           Confirmer la suppression
         </DialogTitle>
-        <DialogContent>
+        <DialogContent className="flex flex-col gap-5 w-[500px] bg-quiz-dark">
           <DialogContentText>
-            Êtes-vous sûr de vouloir supprimer cet utilisateur ?
+            Êtes-vous sûr de vouloir supprimer <span className="font-bold text-white">{selectedUser?.username}</span> ?
           </DialogContentText>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose} color="primary">
+        <DialogActions className="text-white text-sm bg-quiz-dark">
+          <Button onClick={handleCloseDeleteUserDialog} className="text-white text-sm bg-quiz-dark">
             Annuler
           </Button>
-          <Button onClick={handleDelete} color="secondary" autoFocus>
+          <Button onClick={handleDelete} className="text-sm bg-quiz-dark text-red-600" autoFocus>
             Supprimer
           </Button>
         </DialogActions>
