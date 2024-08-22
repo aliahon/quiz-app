@@ -46,6 +46,7 @@ export default function Dialog(props) {
     }
     addUser(inputs);
     resetForm();
+    setEmailError('');
 
   };
   const [emailError, setEmailError] = useState('');

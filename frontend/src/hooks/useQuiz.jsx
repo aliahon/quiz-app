@@ -45,5 +45,8 @@ export function useQuiz() {
     },
   });
 
-  return { data, isQuizLoading, answerQuestion, isAnswering, isFetching };
+  const skip = () =>
+    queryClient.invalidateQueries({ queryKey: ["get-question"] });
+
+  return { data, isQuizLoading, answerQuestion, isAnswering, isFetching, skip };
 }

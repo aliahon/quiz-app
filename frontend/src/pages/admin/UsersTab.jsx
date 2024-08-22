@@ -39,13 +39,13 @@ export default function UsersTab() {
   };
 
   const handleDelete = () => {
+    handleCloseDeleteUserDialog();
     if (selectedUser) {
       deleteUser(selectedUser._id).catch(error => {
         console.error("Failed to delete user:", error);
         // Optionally handle the error, e.g., show a notification
       });
     }
-    handleCloseDeleteUserDialog();
   };
 
   if (isLoadingUsers) {
@@ -112,10 +112,10 @@ export default function UsersTab() {
           </DialogContentText>
         </DialogContent>
         <DialogActions className="text-white text-sm bg-quiz-dark">
-          <Button onClick={handleCloseDeleteUserDialog} className="text-white text-base bg-quiz-dark">
+          <Button onClick={handleCloseDeleteUserDialog} className="px-3 py-2 text-white text-base bg-quiz-dark">
             Annuler
           </Button>
-          <Button onClick={handleDelete} className="text-base bg-quiz-dark text-red-600 hover:bg-red-600 hover:border-white hover:text-white border-red-600" autoFocus>
+          <Button onClick={handleDelete} className="px-3 py-2 text-base bg-quiz-dark text-red-600 hover:bg-red-600 hover:border-white hover:text-white border-red-600" autoFocus>
             Supprimer
           </Button>
         </DialogActions>

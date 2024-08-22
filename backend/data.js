@@ -317,7 +317,6 @@ const questions = [
   {
     question:
       "Les bris de joint universel et de roulement central ainsi que les vibrations de l’arbre de commande sont causés par :",
-    images: ["/public/images/Q-47.png"],
     options: {
       a: "Des fourches desserrées",
       b: "L’arbre de commande plié",

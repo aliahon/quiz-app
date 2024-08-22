@@ -8,7 +8,7 @@ import QuizCountDown from "./components/QuizCountDown";
 import useSession from "../hooks/useSession";
 
 export default function Quiz() {
-  const { data, isQuizLoading, answerQuestion, isAnswering, isFetching } =
+  const { data, isQuizLoading, answerQuestion, isAnswering, isFetching, skip } =
     useQuiz();
 
   const { session } = useSession();
@@ -36,7 +36,9 @@ export default function Quiz() {
           Question <strong>{answeredCount + 1}</strong> / {questionsCount}
         </p>
       </div>
-
+      <div className="flex flx-col justify-center items-center">
+          {session && <QuizCountDown session={session.session} />}
+      </div>
       <div className="flex flex-col gap-10 justify-self-start w-full">
         <h4 className="text-quiz-medium text-xl font-semibold">
           {question?.question}
@@ -81,7 +83,12 @@ export default function Quiz() {
         </div>
       </div>
       <div className="flex justify-between items-center">
-        {session && <QuizCountDown session={session.session} />}
+      <Button
+          className="justify-self-end py-1 text-base bg-green-500 border-none"
+          onClick={() => {skip()}}
+        >
+          Skip
+        </Button>
         <Button
           className="justify-self-end py-1 text-base bg-quiz-theme border-none"
           disabled={!selectedOption || isAnswering}

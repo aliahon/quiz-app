@@ -1,6 +1,9 @@
+const { transporter } = require("../config/mailer");
 const Session = require("../models/SessionModel");
 const User = require("../models/UserModel");
 const bcrypt = require("bcrypt");
+
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const getUsers = async (_req, res) => {
   // find all users except admin
@@ -10,6 +13,18 @@ const getUsers = async (_req, res) => {
 
 const addUser = async (req, res) => {
   const { username, name, email, password, passwordConfirm } = req.body;
+
+  const mailOptions = {
+    from: "your-email@gmail.com",
+    to: email,
+    subject: "Your Account Credentials",
+    text: `Bonjour ${username},\n\nVotre compte a été créé. Voici vos informations de connexion :\n\nNom d'utilisateur : ${username}\nMot de passe : ${password}\n`,
+  };
+
+  // Validate email format
+  if (!emailRegex.test(email)) {
+    return res.status(400).json({ message: "Invalid email format" });
+  }
 
   if (password !== passwordConfirm) {
     return res.status(400).json({ message: "Passwords do not match" });
@@ -24,6 +39,15 @@ const addUser = async (req, res) => {
     email,
     password: hashedPassword,
     role: "user",
+  });
+
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.log(error);
+    } else {
+      console.log("Email sent: " + info.response);
+      res.status(200).send("User created and email sent");
+    }
   });
 
   res.status(200).json({

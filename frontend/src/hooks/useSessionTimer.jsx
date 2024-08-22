@@ -1,3 +1,4 @@
+import { useQueryClient } from "@tanstack/react-query";
 import dayjs from "dayjs";
 import { useEffect, useRef, useState } from "react";
 
@@ -9,6 +10,8 @@ export default function useSessionTimer(session) {
     startTime.diff(now)
   );
   const [remainingEndTime, setRemainingEndTime] = useState(endTime.diff(now));
+
+  const queryClient = useQueryClient();
 
   //   console.log(remainingEndTime / 1000);
 
@@ -32,18 +35,26 @@ export default function useSessionTimer(session) {
   const intervalId = useRef(null);
 
   useEffect(() => {
-    intervalId.current = setInterval(() => {
+    intervalId.current = setInterval(async () => {
       if (startTime.isAfter(dayjs())) {
         setRemainingStartTime(
           (remainingStartTime) => remainingStartTime - 1000
         );
       }
+
       if (startTime.isBefore(dayjs()) || endTime.isAfter(dayjs())) {
         setRemainingEndTime((remainingEndTime) => remainingEndTime - 1000);
       }
     }, 1000);
     return () => clearInterval(intervalId.current);
-  }, [remainingStartTime, remainingEndTime, totalSeconds, startTime, endTime]);
+  }, [
+    remainingStartTime,
+    remainingEndTime,
+    totalSeconds,
+    startTime,
+    endTime,
+    queryClient,
+  ]);
 
   return {
     remainingHours,

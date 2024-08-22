@@ -46,8 +46,11 @@ export default function useUser() {
     mutationFn: (id) => deleteUserApi(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["users"] });
-      toast.error("Utilisateur a été bien supprimé!");
+      toast.success("Utilisateur a été bien supprimé!");
     },
+    onError: () => {
+      toast.error("Utilisateur n'a pas été bien supprimé!");
+    }
   });
 
   return {
