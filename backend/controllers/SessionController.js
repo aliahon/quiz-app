@@ -15,7 +15,7 @@ const getUserSession = async (req, res) => {
       userId,
       isFinished: true,
       isActive: true,
-    });
+    }).sort({createdAt:-1});
 
     if (!session && !expiredSession) {
       return res.status(404).json({ message: "Session not found" });
@@ -93,18 +93,13 @@ const finishSession = async (req, res) => {
 };
 
 const validateSession = async (req, res, next) => {
-  const sessions = await Session.find({ isActive: true });
+  const session = await Session.findOne({ isActive: true });
 
-  await Promise.all(
-    sessions.map(async (session) => {
-      const { startTime, endTime } = session;
-      const currentTime = new Date();
-      if (currentTime > new Date(endTime)) {
-        session.isFinished = true;
-        await session.save();
-      }
-    })
-  );
+  const { endTime } = session;
+  const currentTime = new Date();
+  if (currentTime > new Date(endTime)) {
+    await Session.updateMany({isActive:true},{isFinished:true,isActive:false})
+  }
 
   next();
 };
