@@ -30,8 +30,8 @@ export default function SessionNotStarted({ session }) {
   ]);
 
   return (
-    <div className="flex flex-col items-center justify-center w-full h-full gap-8 sm:gap-16">
-      <span className="text-2xl sm:text-3xl font-semibold text-white text-center tracking-widest px-2">
+    <div className="mt-16 flex flex-col items-center justify-center w-full h-full gap-8 sm:gap-16">
+      <span className="text-xl sm:text-lgfont-semibold text-white text-center tracking-widest px-2">
         La session n’a pas encore commencé. Le temps restant est de
       </span>
       <div className="flex justify-center gap-3 sm:gap-8">
