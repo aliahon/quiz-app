@@ -29,12 +29,5 @@ export const deleteUser = async (id) => {
 
 export const getUserMarks = async () => {
   const response = await axios.get(`/users/get-users-marks/`);
-  const marks = response.data;
-
-  const users = await getAllUsers(); // Await the result of getAllUsers
-  const n = users.length; // Get the number of users
-  const m = marks.length; // Get the number of marks
-
-  // Return the last n marks
-  return marks.slice(m - n, m);
+  return response.data;
 };

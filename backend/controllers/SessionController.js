@@ -1,10 +1,8 @@
+const { transporter } = require("../config/mailer");
 const QuizModel = require("../models/QuizModel");
 const Session = require("../models/SessionModel");
 const User = require("../models/UserModel");
 const ExcelJS = require('exceljs');
-const nodemailer = require('nodemailer');
-const { getUsersMarks } = require("./UserController.js");
-
 
 const getUserSession = async (req, res) => {
   const userId = req.params.userId;
@@ -19,7 +17,7 @@ const getUserSession = async (req, res) => {
       userId,
       isFinished: true,
       isActive: true,
-    }).sort({ createdAt: -1 });
+    });
 
     if (!session && !expiredSession) {
       return res.status(404).json({ message: "Session not found" });
@@ -97,64 +95,94 @@ const finishSession = async (req, res) => {
 };
 
 const validateSession = async (req, res, next) => {
-  const session = await Session.findOne({ isActive: true });
+  const sessions = await Session.find({ isActive: true });
+  let emailSent = false;
+  await Promise.all(
+    sessions.map(async (session) => {
+      const { startTime, endTime } = session;
+      const currentTime = new Date();
+      if (currentTime > new Date(endTime)) {
+        session.isFinished = true;
+        session.isActive = false;
+        await session.save();
+        if (!emailSent) {  // Send email only if it hasn't been sent yet
+          //const data = await getUsersMarks();  // Ensure you have a function to get the necessary data
+          const excelFile = await generateExcelFile(data);
 
-  const {endTime } = session;
-  const currentTime = new Date();
-  if (currentTime > new Date(endTime)) {
-    await Session.updateMany({ isActive: true }, { isFinished: true, isActive: false });
+          // Send email with the generated Excel file
+          await sendEmailWithAttachment(
+            'nohaila09el@gmail.com', // Replace with the admin email
+            'Session Expired Report',
+            'The session has expired. Please find the attached report.',
+            excelFile,
+            'session_expired_report.xlsx'
+          );
 
-    // Generate Excel file
-    const data = await getUsersMarks(); // Ensure you have a function to get the necessary data
-    const excelBuffer = await generateExcelFile(data);
-
-    // Send email with the generated Excel file
-    await sendEmailWithAttachment(
-      'nohaila09el@gmail.com', // Replace with the admin email
-      'Session Expired Report',
-      'The session has expired. Please find the attached report.',
-      excelBuffer,
-      'session_expired_report.xlsx'
-    );
-  }
+          emailSent = true;  // Set flag to true to prevent further emails
+        }
+      }
+    })
+  );
 
   next();
 };
 
-const generateExcelFile = async({ data }) => {
-  //here I have to add the generetion of the excel
+const getUsersMarks = async () => {
+  /*const marks = await Session.find({
+    isFinished: true,
+  }).populate("userId", "-password");*/
+
+  const marks = await Session.aggregate([
+    {
+      $match: { isFinished: true } // Match only completed sessions
+    },
+    {
+      $group: {
+        _id: "$startTime", // Group by startTime
+        sessions: { $push: "$$ROOT" }, // Collect all sessions in an array
+        count: { $sum: 1 } // Count the number of sessions per startTime
+      }
+    },
+    {
+      $sort: { _id: -1 } // Sort by startTime in descending order (most recent first)
+    }])
+
+
+  return marks[0].sessions;
+};
+
+const generateExcelFile = async ({ data }) => {
   const workbook = new ExcelJS.Workbook();
   const worksheet = workbook.addWorksheet('Quiz Marks');
   worksheet.columns = [
-    { header: 'Nom Complet de condidat', key: 'name', width: 30 },
-    { header: 'Nom utilsateur', key: 'username', width: 30 },
-    { header: 'Email', key: 'email', width: 30 },
-    { header: 'Note', key: 'mark', width: 30 },
+    { header: 'Nom Complet de condidat', key: 'name', width: 60 },
+    { header: 'Nom utilsateur', key: 'username', width: 60 },
+    { header: 'Email', key: 'email', width: 60 },
+    { header: 'Note', key: 'mark', width: 60 },
   ];
 
+  if (Array.isArray(data)) {
+    data.forEach((item, index) => {
+      console.log(`Element ${index}:`, item);
+      console.log(`Type of element ${index}:`, typeof item);
+    });
+  } else {
+    console.error('Expected data to be an array but got:', data);
+  }/*
   data.forEach(item => {
     worksheet.addRow({
-      name: item.name,
-      username: item.username,
-      email: item.email,
+      name: item?.userId?.name,
+      username: item?.userId?.username,
+      email: item?.userId?.email ,
       fullMark: item.fullMark,
     });
-  });
+  });*/
 
   const buffer = await workbook.xlsx.writeBuffer();
   return buffer;
 };
 
 const sendEmailWithAttachment = async (to, subject, text, attachmentBuffer, filename) => {
-
-  // Configure transporter
-  const transporter = nodemailer.createTransport({
-    service: 'gmail', // Use your email service
-    auth: {
-      user: 'nohaila09el@gmail.com',
-      pass: '10214ailaEL',
-    },
-  });
 
   // Setup email data
   const mailOptions = {

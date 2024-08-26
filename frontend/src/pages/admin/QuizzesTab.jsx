@@ -2,6 +2,7 @@ import { useState } from "react";
 import { utils, writeFile } from "xlsx";
 import LoadingState from "../../components/LoadingState";
 import useUser from "../../hooks/useUser";
+import Button from "../../components/Button";
 
 export default function QuizzesTab() {
   const { marks, isMarksLoading } = useUser();
@@ -26,14 +27,17 @@ export default function QuizzesTab() {
   };
 
   return (
-    <div className="relative overflow-x-auto border border-quiz-dark sm:rounded-lg w-full">
-      <button
+    <>
+      <div className="flex justify-end">
+      <Button
         onClick={generateExcel}
-        className="mb-4 px-4 py-2 bg-blue-500 text-white rounded"
+        className=" mb-5 py-2 px-3 text-sm"
         disabled={isDownloading}
       >
         {isDownloading ? "Generating..." : "Download Excel"}
-      </button>
+      </Button>
+      </div>
+      <div className="relative overflow-x-auto border border-quiz-dark sm:rounded-lg w-full">
       <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
         <thead className="text-xs bg-slate-400 text-slate-900">
           <tr>
@@ -44,6 +48,7 @@ export default function QuizzesTab() {
         </thead>
         <tbody>
           {marks.map((mark) => (
+            
             <tr key={mark._id}>
               <th
                 scope="row"
@@ -58,5 +63,6 @@ export default function QuizzesTab() {
         </tbody>
       </table>
     </div>
+    </> 
   );
 }

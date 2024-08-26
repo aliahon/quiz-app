@@ -64,10 +64,27 @@ const deleteUser = async (req, res) => {
 };
 
 const getUsersMarks = async (req, res) => {
-  const marks = await Session.find({
+  /*const marks = await Session.find({
     isFinished: true,
-  }).populate("userId", "-password");
-  res.status(200).json(marks);
+  }).populate("userId", "-password");*/
+
+  const marks = await Session.aggregate([
+    {
+      $match: { isFinished: true } // Match only completed sessions
+    },
+    {
+      $group: {
+        _id: "$startTime", // Group by startTime
+        sessions: { $push: "$$ROOT" }, // Collect all sessions in an array
+        count: { $sum: 1 } // Count the number of sessions per startTime
+      }
+    },
+    {
+      $sort: { _id: -1 } // Sort by startTime in descending order (most recent first)
+    }])
+    
+   
+  res.status(200).json(marks[0].sessions);
 };
 
 module.exports = { getUsers, addUser, deleteUser, getUsersMarks };
