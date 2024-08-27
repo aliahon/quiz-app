@@ -96,24 +96,25 @@ const finishSession = async (req, res) => {
 
 const validateSession = async (req, res, next) => {
   const session = await Session.findOne({ isActive: true });
-  // console.log(session);
 
-  if(!session){
+  if (!session) {
     next();
   }
-  
-  const { endTime } = session;
-  const currentTime = new Date();
-  if (currentTime > new Date(endTime)) {
-    
-    await Session.updateMany({ isActive: true }, { isFinished : true, isActive :false });
+  else {
+    const { endTime } = session;
+    const currentTime = new Date();
+    if (currentTime > new Date(endTime)) {
+
+      await Session.updateMany({ isActive: true }, { isFinished: true, isActive: false });
+    }
+    next();
   }
-  next();
+
 };
 
 
 const sendEmail = async () => {
-  const data = await getUsersMarks();  
+  const data = await getUsersMarks();
   const excelFile = await generateExcelFile({ data });
 
   // Send email with the generated Excel file

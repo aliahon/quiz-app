@@ -10,13 +10,14 @@ export default function QuizzesTab() {
   const { marks, isMarksLoading } = useUser();
   const [isDownloading, setIsDownloading] = useState(false);
   const [id, setId] = useState(marks[0]._id || '')
+  let record = marks.find(mark => mark._id === id).sessions;
 
   if (isMarksLoading) return <LoadingState />;
 
   const generateExcel = () => {
     setIsDownloading(true);
 
-    const worksheet = utils.json_to_sheet(marks.map(mark => ({
+    const worksheet = utils.json_to_sheet(record.map(mark => ({
       "Nom du candidat": mark?.user?.name || "Inconnu",
       Email: mark?.user?.email || "Inconnu",
       Note: mark.fullMark,
@@ -65,7 +66,7 @@ export default function QuizzesTab() {
             </tr>
           </thead>
           <tbody>
-            {marks.find(mark => mark._id === id).sessions.map((mark) => (
+            {record.map((mark) => (
 
               <tr key={mark._id}>
                 <th
