@@ -95,46 +95,56 @@ const finishSession = async (req, res) => {
 };
 
 const validateSession = async (req, res, next) => {
-  const sessions = await Session.find({ isActive: true });
-  let emailSent = false;
-  await Promise.all(
-    sessions.map(async (session) => {
-      const { startTime, endTime } = session;
-      const currentTime = new Date();
-      if (currentTime > new Date(endTime)) {
-        session.isFinished = true;
-        session.isActive = false;
-        await session.save();
-        if (!emailSent) {  // Send email only if it hasn't been sent yet
-          //const data = await getUsersMarks();  // Ensure you have a function to get the necessary data
-          const excelFile = await generateExcelFile(data);
+  const session = await Session.findOne({ isActive: true });
+  // console.log(session);
 
-          // Send email with the generated Excel file
-          await sendEmailWithAttachment(
-            'nohaila09el@gmail.com', // Replace with the admin email
-            'Session Expired Report',
-            'The session has expired. Please find the attached report.',
-            excelFile,
-            'session_expired_report.xlsx'
-          );
-
-          emailSent = true;  // Set flag to true to prevent further emails
-        }
-      }
-    })
-  );
-
+  if(!session){
+    next();
+  }
+  
+  const { endTime } = session;
+  const currentTime = new Date();
+  if (currentTime > new Date(endTime)) {
+    
+    await Session.updateMany({ isActive: true }, { isFinished : true, isActive :false });
+  }
   next();
 };
 
+
+const sendEmail = async () => {
+  const data = await getUsersMarks();  
+  const excelFile = await generateExcelFile({ data });
+
+  // Send email with the generated Excel file
+  await sendEmailWithAttachment(
+    'nohaila09el@gmail.com',
+    'Session Expired Report',
+    'The session has expired. Please find the attached report.',
+    excelFile,
+    'session_expired_report.xlsx'
+  );
+};
+
 const getUsersMarks = async () => {
-  /*const marks = await Session.find({
-    isFinished: true,
-  }).populate("userId", "-password");*/
 
   const marks = await Session.aggregate([
     {
       $match: { isFinished: true } // Match only completed sessions
+    },
+    {
+      $lookup: {
+        from: 'users', // The collection to join
+        localField: 'userId', // Field from the input documents
+        foreignField: '_id', // Field from the documents of the "users" collection
+        as: 'user' // Name of the array field to add to the output documents
+      }
+    },
+    {
+      $unwind: {
+        path: '$user', // Deconstructs the array field
+        preserveNullAndEmptyArrays: true // Optional: include sessions without a matching user
+      }
     },
     {
       $group: {
@@ -161,22 +171,14 @@ const generateExcelFile = async ({ data }) => {
     { header: 'Note', key: 'mark', width: 60 },
   ];
 
-  if (Array.isArray(data)) {
-    data.forEach((item, index) => {
-      console.log(`Element ${index}:`, item);
-      console.log(`Type of element ${index}:`, typeof item);
-    });
-  } else {
-    console.error('Expected data to be an array but got:', data);
-  }/*
   data.forEach(item => {
     worksheet.addRow({
-      name: item?.userId?.name,
-      username: item?.userId?.username,
-      email: item?.userId?.email ,
-      fullMark: item.fullMark,
+      name: item?.user?.name,
+      username: item?.user?.username,
+      email: item?.user?.email,
+      mark: item.fullMark,
     });
-  });*/
+  });
 
   const buffer = await workbook.xlsx.writeBuffer();
   return buffer;
@@ -213,6 +215,7 @@ module.exports = {
   startSession,
   finishSession,
   validateSession,
+  sendEmail,
 };
 
 

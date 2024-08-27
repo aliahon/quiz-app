@@ -29,3 +29,9 @@ export const createAdminSession = async ({ startTime, endTime }) => {
   });
   return response.data;
 };
+
+export const sendEmail = async () => {
+  const response = await axios.get("/session/send-email");
+  return response.data;
+};
+

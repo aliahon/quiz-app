@@ -7,6 +7,7 @@ const {
   finishSession,
   createAdminSession,
   validateSession,
+  sendEmail,
 } = require("../controllers/SessionController");
 const allowedRoles = require("../middleware/allowedRoles");
 const { verifyToken } = require("../middleware/verifyToken");
@@ -26,6 +27,14 @@ router.post(
   allowedRoles(["admin"]),
   validateSession,
   createAdminSession
+);
+
+router.get(
+  "/send-email",
+  verifyToken,
+  allowedRoles(["admin"]),
+  validateSession,
+  sendEmail
 );
 
 module.exports = router;

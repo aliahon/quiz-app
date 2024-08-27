@@ -3,6 +3,7 @@ import { utils, writeFile } from "xlsx";
 import LoadingState from "../../components/LoadingState";
 import useUser from "../../hooks/useUser";
 import Button from "../../components/Button";
+import { sendEmail } from "../../api/session";
 
 export default function QuizzesTab() {
   const { marks, isMarksLoading } = useUser();
@@ -14,8 +15,8 @@ export default function QuizzesTab() {
     setIsDownloading(true);
 
     const worksheet = utils.json_to_sheet(marks.map(mark => ({
-      "Nom du candidat": mark?.userId?.name || "Inconnu",
-      Email: mark?.userId?.email || "Inconnu",
+      "Nom du candidat": mark?.user?.name || "Inconnu",
+      Email: mark?.user?.email || "Inconnu",
       Note: mark.fullMark,
     })));
 
@@ -26,11 +27,21 @@ export default function QuizzesTab() {
     setIsDownloading(false);
   };
 
+  
+  const handleButtonClick = async () => {
+    // Then, generate the Excel file
+    generateExcel();
+
+    // Send a signal to the backend
+    await sendEmail();
+  
+  };
+
   return (
     <>
       <div className="flex justify-end">
       <Button
-        onClick={generateExcel}
+        onClick={handleButtonClick}
         className=" mb-5 py-2 px-3 text-sm"
         disabled={isDownloading}
       >
@@ -54,9 +65,9 @@ export default function QuizzesTab() {
                 scope="row"
                 className="px-6 py-4 font-medium whitespace-nowrap text-white"
               >
-                {mark?.userId?.name || "Inconnu"}
+                {mark?.user?.name || "Inconnu"}
               </th>
-              <td className="px-6 py-4">{mark?.userId?.email || "Inconnu"}</td>
+              <td className="px-6 py-4">{mark?.user?.email || "Inconnu"}</td>
               <td className="px-6 py-4">{mark.fullMark}</td>
             </tr>
           ))}

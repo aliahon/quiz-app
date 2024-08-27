@@ -72,6 +72,20 @@ const getUsersMarks = async (req, res) => {
     {
       $match: { isFinished: true } // Match only completed sessions
     },
+     {
+        $lookup: {
+            from: 'users', // The collection to join
+            localField: 'userId', // Field from the input documents
+            foreignField: '_id', // Field from the documents of the "users" collection
+            as: 'user' // Name of the array field to add to the output documents
+        }
+    },
+    {
+        $unwind: {
+            path: '$user', // Deconstructs the array field
+            preserveNullAndEmptyArrays: true // Optional: include sessions without a matching user
+        }
+    },
     {
       $group: {
         _id: "$startTime", // Group by startTime
@@ -81,7 +95,7 @@ const getUsersMarks = async (req, res) => {
     },
     {
       $sort: { _id: -1 } // Sort by startTime in descending order (most recent first)
-    }])
+    }])    
     
    
   res.status(200).json(marks[0].sessions);
