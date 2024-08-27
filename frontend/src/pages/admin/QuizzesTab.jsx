@@ -9,6 +9,7 @@ import DropdownList from "../components/DropdownList";
 export default function QuizzesTab() {
   const { marks, isMarksLoading } = useUser();
   const [isDownloading, setIsDownloading] = useState(false);
+  const [isSending, setIsSending] = useState(false);
   const [id, setId] = useState(marks[0]._id || '')
   let record = marks.find(mark => mark._id === id).sessions;
 
@@ -31,29 +32,39 @@ export default function QuizzesTab() {
   };
 
 
-  const handleButtonClick = async () => {
-    // Then, generate the Excel file
-    generateExcel();
+  const handleSendButtonClick = async () => {
 
     // Send a signal to the backend
     await sendEmail();
 
   };
 
+  const handleDownloaddButtonClick = async () => {
+    generateExcel();
+  };
+
   const handleIdChange = (id) => {
     setId(id);
-};
+  };
 
   return (
-    <> 
+    <>
       <div className="flex justify-between">
-        <DropdownList onSendId={handleIdChange}/>
+        <DropdownList onSendId={handleIdChange} />
         <Button
-          onClick={handleButtonClick}
+          onClick={handleSendButtonClick}
+          className=" mb-5 py-2 px-3 text-sm"
+          disabled={isSending}
+        >
+          {isSending ? "Envoi en cours..." : "Envoyer Excel via email"}
+        </Button>
+
+        <Button
+          onClick={handleDownloaddButtonClick}
           className=" mb-5 py-2 px-3 text-sm"
           disabled={isDownloading}
         >
-          {isDownloading ? "Generating..." : "Download Excel"}
+          {isDownloading ? "Téléchargement en cours..." : "Téléchargement du fichier Excel"}
         </Button>
       </div>
       <div className="relative overflow-x-auto border border-quiz-dark sm:rounded-lg w-full">
