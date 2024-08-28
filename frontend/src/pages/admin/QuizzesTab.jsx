@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState , useEffect} from "react";
 import { utils, writeFile } from "xlsx";
 import LoadingState from "../../components/LoadingState";
 import useUser from "../../hooks/useUser";
 import Button from "../../components/Button";
 import { sendEmail } from "../../api/session";
 import DropdownList from "../components/DropdownList";
+
 
 export default function QuizzesTab() {
   const { marks, isMarksLoading } = useUser();
@@ -31,12 +32,17 @@ export default function QuizzesTab() {
     setIsDownloading(false);
   };
 
+  useEffect(() => {
+    console.log('isSending has changed:', isSending);
+  }, [isSending]);
 
   const handleSendButtonClick = async () => {
-
+    setIsSending(true);
     // Send a signal to the backend
-    await sendEmail();
-
+    sendEmail();
+    setIsSending(false);
+    console.log(isSending);
+    
   };
 
   const handleDownloaddButtonClick = async () => {
@@ -49,11 +55,14 @@ export default function QuizzesTab() {
 
   return (
     <>
+    <div className="flex flex-row">
+    <DropdownList onSendId={handleIdChange} />
+    </div>
+    
       <div className="flex justify-between">
-        <DropdownList onSendId={handleIdChange} />
         <Button
           onClick={handleSendButtonClick}
-          className=" mb-5 py-2 px-3 text-sm"
+          className=" mb-5 py-2 px-3 text-sm hover:bg-white hover:text-[#343A40ff] hover:font-semibold"
           disabled={isSending}
         >
           {isSending ? "Envoi en cours..." : "Envoyer Excel via email"}
@@ -61,7 +70,7 @@ export default function QuizzesTab() {
 
         <Button
           onClick={handleDownloaddButtonClick}
-          className=" mb-5 py-2 px-3 text-sm"
+          className=" mb-5 py-2 px-3 text-sm hover:bg-white hover:text-[#343A40ff] hover:font-semibold"
           disabled={isDownloading}
         >
           {isDownloading ? "Téléchargement en cours..." : "Téléchargement du fichier Excel"}

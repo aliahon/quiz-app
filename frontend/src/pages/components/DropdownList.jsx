@@ -20,10 +20,10 @@ export default function DropdownList({onSendId}) {
         <select
             value={selectedValue}
             onChange={handleChange}
-            className='mb-5 py-2 px-3 text-sm bg-[#343A40ff] text-white rounded-xl'
+            className='mb-5 py-2 px-4 pl-2 text-sm bg-quiz-theme text-white rounded w-1/3 '
         >
             {marks.map((mark) => (
-                <option key={mark._id} value={mark._id}>
+                <option className="bg-[#343A40ff]" key={mark._id} value={mark._id}>
                     {formatDateAndTime(mark._id)}
                 </option>
             ))}

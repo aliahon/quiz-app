@@ -80,7 +80,7 @@ export default function SessionsTab() {
           />
         </label>
         <Button
-          className="justify-self-start py-2 px-3 text-base"
+          className="justify-self-start py-2 px-3 text-base hover:bg-white  hover:text-[#343A40ff] hover:font-semibold"
           onClick={handleStartSession}
           disabled={isCreatingAdminSession}
         >

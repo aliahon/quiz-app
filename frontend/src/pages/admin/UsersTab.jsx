@@ -56,7 +56,7 @@ export default function UsersTab() {
     <>
       <div className="flex justify-end">
         <Button
-          className="mb-5 py-2 px-3 text-sm"
+          className="mb-5 py-2 px-3 text-sm hover:bg-white  hover:text-[#343A40ff] hover:font-semibold"
           onClick={handleOpenAddUserDialog}
         >
           Ajouter un candidat
@@ -96,7 +96,7 @@ export default function UsersTab() {
         </table>
       </div>
 
-      {/* Dialog for confirmation */}
+      {/* Dialog for confirmation (delete)*/}
       <Dialog
         open={isDeleteUserDialogOpen}
         onClose={handleCloseDeleteUserDialog}
@@ -108,14 +108,14 @@ export default function UsersTab() {
         </DialogTitle>
         <DialogContent className="flex flex-col gap-5 w-[500px] bg-quiz-dark">
           <DialogContentText >
-            <p className="text-white">Êtes-vous sûr de vouloir supprimer <span className="font-bold text-lg text-red-700">{selectedUser?.username}</span> ?</p>
+            <p className="text-white">Êtes-vous sûr de vouloir supprimer <span className="font-bold text-lg text-red-500">{selectedUser?.username}</span> ?</p>
           </DialogContentText>
         </DialogContent>
         <DialogActions className="text-white text-sm bg-quiz-dark">
           <Button onClick={handleCloseDeleteUserDialog} className="px-3 py-2 text-white text-base bg-quiz-dark">
             Annuler
           </Button>
-          <Button onClick={handleDelete} className="px-3 py-2 text-base bg-quiz-dark text-red-600 hover:bg-red-600 hover:border-white hover:text-white border-red-600" autoFocus>
+          <Button onClick={handleDelete} className="px-3 py-2 text-base bg-quiz-dark text-red-500 hover:bg-red-600 hover:border-white hover:text-white border-red-600" autoFocus>
             Supprimer
           </Button>
         </DialogActions>
