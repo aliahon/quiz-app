@@ -120,10 +120,10 @@ const sendEmail = async () => {
   // Send email with the generated Excel file
   await sendEmailWithAttachment(
     'nohaila09el@gmail.com',
-    'Session Expired Report',
-    'The session has expired. Please find the attached report.',
+    'Rapport de la dernière session',
+    'Bonjour,\n\nVeuillez trouver ci-joint le rapport de la dernière session.',
     excelFile,
-    'session_expired_report.xlsx'
+    'rapport_de_derniere_session.xlsx'
   );
 };
 
