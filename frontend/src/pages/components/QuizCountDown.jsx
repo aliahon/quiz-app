@@ -3,12 +3,15 @@ import Button from "../../components/Button";
 import useSessionTimer from "../../hooks/useSessionTimer";
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
+import useAuth from "../../hooks/useAuth";
 
 export default function QuizCountDown({ session }) {
   const { remainingEndMinutes, remainingEndHours, remainingEndSeconds } =
     useSessionTimer(session);
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const { logout} = useAuth();
+
 
   useEffect(() => {
     (async () => {
@@ -17,18 +20,16 @@ export default function QuizCountDown({ session }) {
         remainingEndMinutes <= 0 &&
         remainingEndSeconds <= 0
       ) {
-        await queryClient.invalidateQueries({
-          queryKey: ["session"],
-        });
-        navigate("/session");
+        //window.location.reload();
+        await logout();
       }
     })();
   }, [
-    navigate,
     queryClient,
     remainingEndHours,
     remainingEndMinutes,
     remainingEndSeconds,
+    logout,
   ]);
 
   const minuteCircle = useRef();

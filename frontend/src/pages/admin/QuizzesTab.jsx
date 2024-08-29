@@ -3,14 +3,14 @@ import { utils, writeFile } from "xlsx";
 import LoadingState from "../../components/LoadingState";
 import useUser from "../../hooks/useUser";
 import Button from "../../components/Button";
-import { sendEmail } from "../../api/session";
 import DropdownList from "../components/DropdownList";
+import { useEmail } from "../../hooks/useEmail";
 
 
 export default function QuizzesTab() {
   const { marks, isMarksLoading } = useUser();
   const [isDownloading, setIsDownloading] = useState(false);
-  const [isSending, setIsSending] = useState(false);
+  const {sendEmail,isSending}=useEmail();
   const [id, setId] = useState(marks[0]._id || '')
   let record = marks.find(mark => mark._id === id).sessions;
 
@@ -32,19 +32,6 @@ export default function QuizzesTab() {
     setIsDownloading(false);
   };
 
-  useEffect(() => {
-    console.log('isSending has changed:', isSending);
-  }, [isSending]);
-
-  const handleSendButtonClick = async () => {
-    setIsSending(true);
-    // Send a signal to the backend
-    sendEmail();
-    setIsSending(false);
-    console.log(isSending);
-    
-  };
-
   const handleDownloaddButtonClick = async () => {
     generateExcel();
   };
@@ -55,13 +42,14 @@ export default function QuizzesTab() {
 
   return (
     <>
-    <div className="flex flex-row">
+    <div>
+      <p className="text-sm">Filtrer les sessions par heure de début :</p>
     <DropdownList onSendId={handleIdChange} />
     </div>
     
       <div className="flex justify-between">
         <Button
-          onClick={handleSendButtonClick}
+          onClick={sendEmail}
           className=" mb-5 py-2 px-3 text-sm hover:bg-white hover:text-[#343A40ff] hover:font-semibold"
           disabled={isSending}
         >

@@ -31,7 +31,7 @@ export const createAdminSession = async ({ startTime, endTime }) => {
 };
 
 export const sendEmail = async () => {
-  const response = await axios.get("/session/send-email");
+  const response = await axios.post("/session/send-email");
   return response.data;
 };
 

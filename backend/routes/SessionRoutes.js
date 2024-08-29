@@ -29,7 +29,7 @@ router.post(
   createAdminSession
 );
 
-router.get(
+router.post(
   "/send-email",
   verifyToken,
   allowedRoles(["admin"]),

@@ -113,18 +113,26 @@ const validateSession = async (req, res, next) => {
 };
 
 
-const sendEmail = async () => {
+const sendEmail = async (_, res) => {
   const data = await getUsersMarks();
   const excelFile = await generateExcelFile({ data });
+  try {
+    
+    // Send email with the generated Excel file
+    await sendEmailWithAttachment(
+      'nohaila09el@gmail.com',
+      'Rapport de la dernière session',
+      'Bonjour,\n\nVeuillez trouver ci-joint le rapport de la dernière session.',
+      excelFile,
+      'rapport_de_derniere_session.xlsx'
+    );
+    return res.status(200).json("email sent successfully")
+  } catch (error) {
+    return res.status(400).json("something went wrong")
+    
+  }
 
-  // Send email with the generated Excel file
-  await sendEmailWithAttachment(
-    'nohaila09el@gmail.com',
-    'Rapport de la dernière session',
-    'Bonjour,\n\nVeuillez trouver ci-joint le rapport de la dernière session.',
-    excelFile,
-    'rapport_de_derniere_session.xlsx'
-  );
+
 };
 
 const getUsersMarks = async () => {
@@ -201,12 +209,8 @@ const sendEmailWithAttachment = async (to, subject, text, attachmentBuffer, file
     ],
   };
 
-  try {
+  
     await transporter.sendMail(mailOptions);
-    console.log('Email sent successfully');
-  } catch (error) {
-    console.error('Error sending email:', error);
-  }
 };
 
 module.exports = {

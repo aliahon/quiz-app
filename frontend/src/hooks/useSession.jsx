@@ -59,6 +59,9 @@ export default function useSession() {
       //   await queryClient.invalidateQueries({ queryKey: ["session"] });
       // },
     });
+    
+  
+    
 
   return {
     session,
