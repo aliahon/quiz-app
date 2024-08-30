@@ -5,10 +5,17 @@ const bcrypt = require("bcrypt");
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+
 const getUsers = async (_req, res) => {
   // find all users except admin
   const users = await User.find({ role: { $ne: "admin" } }, { password: 0 });
   res.status(200).json(users);
+};
+
+const getUser = async (_req, res) => {
+  const {id} = _req.params;
+  const oneUser = await User.findById(id);
+  res.status(200).json(oneUser);
 };
 
 const addUser = async (req, res) => {
@@ -52,6 +59,44 @@ const addUser = async (req, res) => {
 
   res.status(200).json({
     message: "User created",
+    user: { _id: user._id, username: user.username },
+  });
+};
+
+
+const updateUser = async (req, res) => {
+  const { id} = req.params;
+  const user = await User.findByIdAndUpdate(id, req.body);
+
+  const mailOptions = {
+    from: "your-email@gmail.com",
+    to: email,
+    subject: "La modification de vos informations de connexion",
+    text: `Bonjour ${username},\n\nVotre compte a été modifié. Voici vos informations de connexion :\n\nNom d'utilisateur : ${username}\nMot de passe : ${password}\n`,
+  };
+
+  // Validate email format
+  if (!emailRegex.test(email)) {
+    return res.status(400).json({ message: "Invalid email format" });
+  }
+
+  if (password !== passwordConfirm) {
+    return res.status(400).json({ message: "Passwords do not match" });
+  }
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.log(error);
+    } else {
+      console.log("Email sent: " + info.response);
+      res.status(200).send("User updateded and email sent");
+    }
+  });
+
+  res.status(200).json({
+    message: "User updateded",
     user: { _id: user._id, username: user.username },
   });
 };
@@ -102,4 +147,4 @@ const getUsersMarks = async (req, res) => {
   res.status(200).json(marks);
 };
 
-module.exports = { getUsers, addUser, deleteUser, getUsersMarks };
+module.exports = { getUsers,getUser, addUser,updateUser, deleteUser, getUsersMarks };

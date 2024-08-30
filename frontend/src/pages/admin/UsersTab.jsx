@@ -3,6 +3,7 @@ import Button from "../../components/Button";
 import LoadingState from "../../components/LoadingState";
 import useUser from "../../hooks/useUser";
 import AddUserDialog from "../../components/AddUserDialog";
+import UpdateUserDialog from "../../components/UpdateUserDialog";
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
@@ -10,16 +11,19 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';
+import { AiOutlineEdit } from "react-icons/ai";
 
 export default function UsersTab() {
   const { users, isLoadingUsers, deleteUser, isDeletingUser } = useUser();
   const [isAddUserDialogOpen, setIsAddUserDialogOpen] = useState(false);
+  const [isUpdateUserDialogOpen, setIsUpdateUserDialogOpen] = useState(false);
   const [isDeleteUserDialogOpen, setIsDeleteUserDialogOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
 
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
+  //add user dialog
   const handleCloseAddUserDialog = () => {
     setIsAddUserDialogOpen(false);
   };
@@ -31,6 +35,15 @@ export default function UsersTab() {
 
   const handleOpenAddUserDialog = () => {
     setIsAddUserDialogOpen(true);
+  };
+
+//update user dialog
+  const handleCloseUpdateUserDialog = () => {
+    setIsAddUserDialogOpen(false);
+  };
+
+  const handleOpenUpdateUserDialog = () => {
+    setIsUpdateUserDialogOpen(true);
   };
 
   const handleOpenDeleteUserDialog = (user) => {
@@ -82,6 +95,10 @@ export default function UsersTab() {
                 <td className="px-6 py-4">{user.email}</td>
                 <td className="px-6 py-4">{user.username}</td>
                 <td className="px-6 py-4 text-right">
+                  <button onClick={handleOpenUpdateUserDialog}>
+                    <AiOutlineEdit className="text-2xl text-yellow-600" />
+                  </button>
+                  <UpdateUserDialog open={isUpdateUserDialogOpen} onClose={handleCloseUpdateUserDialog}  />
                   <button
                     disabled={isDeletingUser}
                     onClick={() => handleOpenDeleteUserDialog(user)}

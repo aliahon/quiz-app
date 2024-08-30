@@ -2,13 +2,15 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from 'react-hot-toast';
 import {
   getAllUsers,
+  getUser,
+  updateUser as updateUserApi,
   addUser as addUserApi,
   deleteUser as deleteUserApi,
   getUserMarks,
 } from "../api/user";
 import useAuth from "./useAuth";
 
-export default function useUser() {
+export default function useUser(userId) {
   const queryClient = useQueryClient();
   const { user, isUserLoading } = useAuth();
 
@@ -29,6 +31,15 @@ export default function useUser() {
     staleTime: 60 * 60 * 24 * 7,
   });
 
+  const { data: oneUser, isLoading: isLoadingUser } = useQuery(
+    ['oneUser', userId], // Query key includes id
+    () => getUser(userId), // Query function
+    {
+      enabled: !!userId, // Only fetch when id is available
+      staleTime: 60 * 60 * 24 * 7 // Define stale time
+    }
+  );
+
   const { mutate: addUser, isPending: isAddingUser } = useMutation({
     mutationFn: (user) => addUserApi(user),
     onSuccess: () => {
@@ -39,6 +50,20 @@ export default function useUser() {
 
     onError:()=>{
       toast.error("Utilisateur n'a pas été bien ajouté!")
+    }
+  });
+  
+
+  const { mutate: updateUser, isPending: isUpdatingUser } = useMutation({
+    mutationFn: (user) => updateUserApi(user),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+
+      toast.success("Utilisateur a été bien modifié!");
+    },
+
+    onError:()=>{
+      toast.error("Utilisateur n'a pas été bien modifié!")
     }
   });
 
@@ -56,8 +81,12 @@ export default function useUser() {
   return {
     users,
     isLoadingUsers,
+    oneUser,
+    isLoadingUser,
     addUser,
     isAddingUser,
+    updateUser,
+    isUpdatingUser,
     deleteUser,
     isDeletingUser,
     marks,

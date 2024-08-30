@@ -27,7 +27,17 @@ export const deleteUser = async (id) => {
   return response.data;
 };
 
+export const updateUser = async (id) => {
+  const response = await axios.put(`/users/update-user/${id}`);
+  return response.data;
+};
+
 export const getUserMarks = async () => {
   const response = await axios.get(`/users/get-users-marks/`);
+  return response.data;
+};
+
+export const getUser = async (id) => {
+  const response = await axios.get(`/get-one-user/${id}`);
   return response.data;
 };
