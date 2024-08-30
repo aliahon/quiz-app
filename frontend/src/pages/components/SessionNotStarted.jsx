@@ -13,12 +13,10 @@ export default function SessionNotStarted({ session }) {
       if (
         remainingHours <= 0 &&
         remainingMinutes <= 0 &&
-        remainingSeconds <= 0.99 &&
+        remainingSeconds <= 0.9 &&
         totalDays <= 0
       ) {
-        window.location.reload();
-        window.location.reload();
-
+        window.location.reload(false);
       }
     })();
   }, [
